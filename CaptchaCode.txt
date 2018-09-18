@@ -1,0 +1,153 @@
+@model BIET.Models.AccountLogin
+@{
+ViewBag.Title = "Log in";
+Layout = "";
+var message = TempData["Message"] ?? string.Empty;
+var messageStatus = TempData["messageStatus"] ?? string.Empty;
+var messagemidStatus = TempData["messagemidStatus"] ?? string.Empty;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Bundelkhand Institute of Engineering & Technology, Jhansi</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="~/Content/css/bootstrap.min.css" rel='stylesheet' />
+<link href="~/Content/css/font-awesome.css" rel="stylesheet">
+<link href="~/Content/css/mdb.min.css" rel="stylesheet">
+<link href="~/Content/css/login.css" rel='stylesheet' />
+</head>
+<body>
+<div class="col-md-12">
+<div class="row">
+<div class="col-md-9 lg-left">
+<header>
+<div class="col-md-12">
+<div class="logo">
+<a href="@Url.Action("Login", "Account")">
+<img src="~/Content/images/college-logo.png" /></a>
+</div>
+</div>
+</header>
+<div class="login-box">
+<h3>For Registration of New Students</h3>
+<div class="row">
+<div class="col-md-5">
+<div class="form-group">
+<a href="@Url.Action("ValidateStudent", "Account")" class="btn btn-block btn-default waves-effect waves-light">Register here</a>
+</div>
+</div>
+</div>
+</div>
+<div class="footer">
+<div class="row">
+<div class="col-md-12">
+<p>Copyright Bundelkhand Institute of Engineering & Technology, Jhansi</p>
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-3 lg-right">
+@using (Html.BeginForm(new { returnUrl = ViewBag.returnUrl }))
+{ @Html.AntiForgeryToken()
+<div class="registration">
+<div class="heading">Online Admission System</div>
+<h3><span>Login</span> For Registered Students</h3>
+<div class="md-form">
+@* <input type="text" class="form-control" name="Applicant" id="name" />*@
+@Html.TextBoxFor(m => m.UserName, new {@class="form-control",@ValidateKey="inputUserId" })
+<label>User ID</label>
+</div>
+<div class="md-form">
+@*<input type="text" class="form-control" name="Aadhaar" />*@
+@Html.PasswordFor(m => m.Password, new {@class="form-control",@ValidateKey="inputPassword" })
+<label>Password</label>
+</div>
+<div class="md-form">
+<label></label>
+<img src='@Url.Action("GetCaptchaImage", "Account")' id="imgCaptcha" width="80%" height="40" style="float:left; border:1px solid #ccc;" />
+<i class="fa fa-2x fa-refresh" id="captchaRefresh" title="Reload Captcha" style="color: #085aae; padding-top: 3px; margin-left: 10px"></i>
+</div>
+<div class="md-form">
+<label style="display:none">Captcha</label>
+@Html.TextBoxFor(m => m.CaptchaText, new { @class = "form-control",@autocomplete="false",@maxlength="4", @ValidateKey="inputCaptcha", @placeholder = "Enter Calculated value" })
+</div>
+<div class="md-form">
+<a href="@Url.Action("ForgotPassword", "Account")">Forgot Password</a>
+</div>
+<div class="md-form">
+@* <a href="@Url.Action("PersonalInformation", "BIET_Registration")" class="btn btn-block waves-effect waves-light btn-primary">Login</a>*@
+<input type="submit" class="btn btn-block waves-effect waves-light btn-primary" onclick="return validate()" id="btnLogin" value="Login" />
+</div>
+</div>
+}
+</div>
+</div>
+</div>
+<script src="~/Content/js/jquery-1.10.2.min.js"></script>
+<script src="~/Content/js/bootstrap.min.js"></script>
+<script src="~/Content/js/mdb.min.js"></script>
+<script src="~/Content/js/sweetalert.min.js"></script>
+<link href="~/Content/css/sweetalert.css" rel="stylesheet" />
+<script>
+var message = '@message';
+var messageStatus = '@messageStatus';
+var messagemidStatus = '@messagemidStatus';
+if (message)
+sweetAlert(message, messagemidStatus, messageStatus);
+$(document).ready(function ()
+{
+var querystring='@HttpContext.Current.Request.RawUrl.ToLower()';
+if (querystring == "/?returnurl=sessiontimeout")
+{
+swal("Session has been expired", "", "error");
+}
+$("#captchaRefresh").click(function () {
+debugger;
+loadCaptcha();
+});
+function loadCaptcha() {
+debugger;
+var urlAction = '@Url.Action("GetCaptchaImage", "Account")';
+$.ajax({
+type: "POST",
+url: urlAction,
+contentType: 'application/json',
+dataType: 'html'
+})
+.success(function (result) {
+$("#imgCaptcha").attr("src", urlAction);
+})
+}
+$('form').submit(function (e)
+{
+isOk = true;
+$('[ValidateKey*="input"]').each(function ()
+{
+debugger;
+if ($(this).val() == "")
+{
+$(this).focus();
+swal("Please Enter " + $(this).parent().find('label').text());
+isOk = false;
+e.preventDefault();
+return false;
+}
+});
+});
+})
+function validate() {
+var UserName = $("#UserName").val().trim();
+var Password = $("#Password").val().trim();
+if (UserName == '') {
+swal("Enter User ID", "", "warning")
+return false;
+} else if (Password == '') {
+swal("Enter Password", "", "warning")
+return false;
+}
+}
+</script>
+</body>
+</html>
